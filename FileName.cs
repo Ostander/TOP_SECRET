@@ -1,145 +1,157 @@
-﻿public abstract class Entity
+﻿using System.Diagnostics;
+class Neuron
 {
-    public int X;
-    public int Y;
-    public Controller Controller;
-
-    protected Entity(int y, int x, Controller controller)
+    public double Out;
+    public double SIn;
+    public Neuron(double SIN = 0.0, double OUT = 0.0)
     {
-        Y = y;
-        X = x;
-        Controller = controller;
+        SIn = SIN;
+        Out = OUT;
     }
-
-    public virtual void Update(World world)
+    public virtual void CollectInputs()
     {
-        var action = Controller.GetAction(this, world);
-        X += action.DeltaX;
-        Y += action.DeltaY;
+        foreach (var synapse in MySynapseList)
+            SIn += synapse.Out.Out * synapse.Weight;
     }
+    public virtual void Activate()
+    {
+        Out = Math.Max(0.0, SIn);
+        SIn = 0;
+    }
+    public List<Synapse> MySynapseList = new List<Synapse>();
 }
-public abstract class Controller
+class SensorNeuron : Neuron
 {
-    public abstract Action GetAction(Entity entity, World world);
-}
-public class Action
-{
-    public int DeltaX;
-    public int DeltaY;
-}
-class Agent : Entity
-{
-    public Agent(int y, int x, Controller controller) : base(y, x, controller)
+    public SensorNeuron(double SIN = 0.0, double OUT = 0.0)
     {
 
     }
+    public override void CollectInputs() { }
 }
-class Enemy : Entity
+class ProcessingNeuron : Neuron
 {
-    public Enemy(int y, int x, Controller controller) : base(y, x, controller)
+    public double Total;
+    public double Bias;
+    public double Decay;
+    public ProcessingNeuron(double BIAS = 0.0, double DECAY = 0.0, double TOTAL = 0.0, double SIN = 0.0, double OUT = 0.0)
     {
+        Total = TOTAL;
+        Bias = BIAS;
+        Decay = DECAY;
+    }
+    public override void Activate()
+    {
+        Total = Total * Decay + Bias + SIn;
+        SIn = 0.0;
+        Out = Math.Max(0.0, Total);
+    }
+}
 
+class MotorNeuron : Neuron
+{
+    public double Total;
+    public MotorNeuron(double TOTAL = 0.0, double SIN = 0.0, double OUT = 0.0)
+    {
+        Total = TOTAL;
     }
 }
-class God : Entity
-{
-    public God(int y, int x, Controller controller) : base(y, x, controller)
-    {
 
+class Synapse
+{
+    public Neuron Out;
+    public Neuron In;
+    public double Weight = 1.0;
+    public Synapse(Neuron OUT, Neuron IN)
+    {
+        In = IN;
+        Out = OUT;
     }
 }
-class Test : Entity
-{
-    public Test(int y, int x, Controller controller) : base(y, x, controller)
-    {
 
-    }
-}
-class AgentController : Controller
+class Network0
 {
-    public override Action GetAction(Entity entity, World world)
-    {
-        return new Action { DeltaX = 0, DeltaY = 0 };
-    }
-}
-class EnemyController : Controller
-{
-    public override Action GetAction(Entity entity, World world)
-    {
-        return new Action { DeltaX = 0, DeltaY = 0 };
-    }
-}
-class GodController : Controller
-{
-    public override Action GetAction(Entity entity, World world)
-    {
-        return new Action { DeltaX = 0, DeltaY = 0 };
-    }
-}
-class TestController : Controller
-{
-    public override Action GetAction(Entity entity, World world)
-    {
-        return new Action { DeltaX = 0, DeltaY = 0 };
-    }
-}
-class NullController : Controller
-{
-    public override Action GetAction(Entity entity, World world)
-    {
-        return new Action { DeltaX = 0, DeltaY = 0 };
-    }
-}
-public class Map
-{
-    public int Width;
-    public int Height;
-    public Map(int width, int height)
-    {
-        Width = width;
-        Height = height;
-    }
-}
-public class World
-{
-    public Map Map;
-    public List<Entity> Entities;
-    public World(Map map)
-    {
-        Map = map;
-        Entities = new List<Entity>();
-    }
-    public void Update()
-    {
+    public List<SensorNeuron> Sensors = new List<SensorNeuron>();
+    public List<ProcessingNeuron> Hidden = new List<ProcessingNeuron>();
+    public List<MotorNeuron> Motors = new List<MotorNeuron>();
 
-    }
-}
-class Renderer
-{
-    static Renderer()
+    public List<Synapse> SynapseList = new List<Synapse>();
+
+    public Network0(int num_in, int num_hid, int num_out)
     {
+        Stopwatch sw = new Stopwatch();
 
+        sw.Start();
+        CreateNetwork(num_in, num_hid, num_out);
+        sw.Stop();
+
+        ForwardNetwork();
+        Console.WriteLine($"Время создания сети: {sw.Elapsed.TotalMilliseconds} мс ({sw.ElapsedTicks} тиков таймера)");
     }
-    public void Draw(World world)
+    public void CreateNetwork(int num_in, int num_hid, int num_out)
     {
+        for (int i = 0; i < num_in; i++)
+            Sensors.Add(new SensorNeuron());
 
+        for (int i = 0; i < num_hid; i++)
+            Hidden.Add(new ProcessingNeuron(BIAS: 0.0, DECAY: 0.99));
+
+        for (int i = 0; i < num_out; i++)
+            Motors.Add(new MotorNeuron());
+
+        foreach (var hid in Hidden)
+            foreach (var sens in Sensors)
+            {
+                Synapse synapse = new Synapse(sens, hid);
+                SynapseList.Add(synapse);
+                hid.MySynapseList.Add(synapse);
+            }
+
+        foreach (var mot in Motors)
+            foreach (var hid in Hidden)
+            {
+                Synapse synapse = new Synapse(hid, mot);
+                SynapseList.Add(synapse);
+                mot.MySynapseList.Add(synapse);
+            }
     }
-}
-class InputHandler
-{
 
-}
-class GameState
-{
-    public GameState()
+    public void ForwardNetwork()
     {
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
 
-    }
-}
-class Project1
-{
-    static void Main1()
-    {
+        for (int tick = 0; tick < 10; tick++)
+        {
+            if (tick == 1)
+            {
+                Sensors[0].SIn += 1.0;
+                Sensors[1].SIn += 3.0;
+            }
 
+            foreach (var neuron in Sensors)
+                neuron.Activate();
+
+            foreach (var neuron in Hidden)
+            {
+                neuron.CollectInputs();
+                neuron.Activate();
+            }
+
+            foreach (var neuron in Motors)
+            {
+                neuron.CollectInputs();
+                neuron.Activate();
+            }
+
+            Console.WriteLine($"================[tick: {tick}]================");
+        }
+
+        sw.Stop();
+        double averageMsPerTick = sw.Elapsed.TotalMilliseconds / 10;
+
+        Console.WriteLine("\n================[АНАЛИЗ ВРЕМЕНИ]================");
+        Console.WriteLine($"Всего времени на {10} тиков: {sw.Elapsed.TotalMilliseconds} мс");
+        Console.WriteLine($"В среднем на один тик: {averageMsPerTick} мс");
+        Console.WriteLine("================================================\n");
     }
 }
