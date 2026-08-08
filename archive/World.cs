@@ -1,4 +1,4 @@
-﻿public abstract class Entity
+﻿/*public abstract class Entity
 {
     public int X;
     public int Y;
@@ -41,20 +41,6 @@ class Enemy : Entity
 
     }
 }
-class God : Entity
-{
-    public God(int y, int x, Controller controller) : base(y, x, controller)
-    {
-
-    }
-}
-class Test : Entity
-{
-    public Test(int y, int x, Controller controller) : base(y, x, controller)
-    {
-
-    }
-}
 class AgentController : Controller
 {
     public override Action GetAction(Entity entity, World world)
@@ -63,20 +49,6 @@ class AgentController : Controller
     }
 }
 class EnemyController : Controller
-{
-    public override Action GetAction(Entity entity, World world)
-    {
-        return new Action { DeltaX = 0, DeltaY = 0 };
-    }
-}
-class GodController : Controller
-{
-    public override Action GetAction(Entity entity, World world)
-    {
-        return new Action { DeltaX = 0, DeltaY = 0 };
-    }
-}
-class TestController : Controller
 {
     public override Action GetAction(Entity entity, World world)
     {
@@ -131,15 +103,14 @@ class InputHandler
 }
 class GameState
 {
-    public GameState()
+    public List<Agent> ListAgent;
+    public List<Enemy> ListEnemy;
+    public World World;
+    public Renderer Render;
+    public GameState(World world, Renderer render)
     {
+        World = world;
+        Render = render;
 
     }
-}
-class Project1
-{
-    static void Main1()
-    {
-
-    }
-}
+}*/

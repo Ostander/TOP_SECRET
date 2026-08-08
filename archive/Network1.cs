@@ -32,7 +32,8 @@
 
         Weight = new float[weight];
 
+        Random rnd = new Random();
         for (int i = 0; i < weight; i++)
-            Weight[i] = 1.0f;
+            Weight[i] = rnd.NextSingle() * 20.0f - 10.0f;
     }
 }
