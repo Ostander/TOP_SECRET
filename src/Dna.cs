@@ -5,6 +5,7 @@ public class Dna
     public byte[] Data;
 
     // Создать случайную ДНК заданной длины
+    
     public Dna(int length)
     {
         Data = new byte[length];
