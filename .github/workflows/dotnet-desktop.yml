@@ -2,9 +2,9 @@ name: .NET Build
 
 on:
   push:
-    branches: [ "main" ]   # если твоя ветка называется master, замени
+    branches: [ "master" ]   # если твоя ветка называется master, замени
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
   build:
