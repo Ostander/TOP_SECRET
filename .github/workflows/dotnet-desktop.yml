@@ -43,7 +43,7 @@ jobs:
       with:
         name: Nightly build ${{ github.run_number }}
         tag_name: nightly-${{ github.run_number }}
-        prerelease: true
+        release: true
         files: ./publish/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
