@@ -1,5 +1,5 @@
 ﻿public class Agent
-{
+{ 
     public int X, Y;
     public SpikingNetwork Brain;
     public Dna Genome;
