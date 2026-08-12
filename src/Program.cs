@@ -33,12 +33,12 @@ class Program
         world.Agents.Add(agent);
 
         // Простейший консольный вывод каждые 100 шагов
-        for (int step = 0; step < 1000; step++)
+        for (int step = 0; step < 100; step++)
         {
             world.Update();
 
             // Вывод каждые 10 шагов, чтобы не мельтешило
-            if (step % 100 == 0)
+            if (step % 10 == 0)
             {
                 int sensorSpikes = agent.Brain.Spike.Take(agent.Brain.NumSensors).Count(s => s);
                 int motorSpikes = agent.Brain.Spike.Skip(agent.Brain.NumSensors).Take(agent.Brain.NumMotors).Count(s => s);
