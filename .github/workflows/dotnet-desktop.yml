@@ -32,7 +32,7 @@ jobs:
         path: ./publish
 
     - name: Create Release
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/master'
       uses: softprops/action-gh-release@v2
       with:
         name: Nightly build ${{ github.run_number }}
